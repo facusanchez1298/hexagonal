@@ -2,6 +2,7 @@ plugins {
 	id 'org.springframework.boot' version '2.5.2'
 	id 'io.spring.dependency-management' version '1.0.11.RELEASE'
 	id 'java'
+	id "info.solidsoft.pitest" version '1.5.1'
 }
 
 group = 'com.example'
@@ -18,6 +19,8 @@ repositories {
 	mavenCentral()
 }
 
+configurations.maybeCreate('pitest')
+
 ext {
 	set('springCloudVersion', "2020.0.3")
 }
@@ -30,13 +33,25 @@ dependencies {
 	annotationProcessor 'org.projectlombok:lombok'
 	testImplementation 'org.springframework.boot:spring-boot-starter-test'
 	implementation 'com.h2database:h2'
-
+	pitest 'org.pitest:pitest-junit5-plugin:0.12'
+	testCompileOnly 'info.solidsoft.gradle.pitest:gradle-pitest-plugin:1.4.0'
 }
 
 dependencyManagement {
 	imports {
 		mavenBom "org.springframework.cloud:spring-cloud-dependencies:${springCloudVersion}"
 	}
+}
+
+pitest {
+	testPlugin = 'junit5'
+	junit5PluginVersion = '0.12'
+	outputFormats = ['XML', 'HTML']
+	mutationThreshold = 100
+	timestampedReports = false
+	excludedClasses = [
+			'com.example.hexagonal.HexagonalApplication',
+	]
 }
 
 test {
