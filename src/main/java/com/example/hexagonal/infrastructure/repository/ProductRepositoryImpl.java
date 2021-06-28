@@ -14,23 +14,28 @@ public class ProductRepositoryImpl implements ProductRepository {
 
     @Override
     public Product createProduct(Product product) {
-        //todo search the chain setter method
-        ProductDao productDao = new ProductDao();
-        productDao.setDescription(product.getDescription());
-        productDao.setBuyPrice(product.getBuyPrice());
-        productDao.setSellPrice(product.getSellPrice());
+        ProductDao productDao = getProductDao(product);
+        ProductDao productDaoResponse = productRepositoryCrud.save(productDao);
+        return getProduct(product, productDaoResponse);
+    }
 
-        productDao = productRepositoryCrud.save(productDao);
-
+    private Product getProduct(Product product, ProductDao productDaoResponse) {
         return Product.builder()
-                .id(String.valueOf(productDao.getId()))
+                .id(String.valueOf(productDaoResponse.getId()))
                 .price(
                         Price.builder()
-                                .sellPrice(productDao.getSellPrice())
-                                .buyPrice(productDao.getBuyPrice())
+                                .sellPrice(productDaoResponse.getSellPrice())
+                                .buyPrice(productDaoResponse.getBuyPrice())
                                 .build()
                 )
                 .description(product.getDescription())
                 .build();
+    }
+
+    private ProductDao getProductDao(Product product) {
+        return new ProductDao()
+                .setDescription(product.getDescription())
+                .setBuyPrice(product.getBuyPrice())
+                .setSellPrice(product.getSellPrice());
     }
 }

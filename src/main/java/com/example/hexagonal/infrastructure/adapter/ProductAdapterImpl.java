@@ -15,29 +15,27 @@ public class ProductAdapterImpl implements ProductAdapter {
 
     @Override
     public ProductCreationResponse createProduct(ProductCreationRequest productCreationRequest) {
-        Product product = Product.builder()
-                .price(
-                        Price.builder()
-                                .buyPrice(
-                                        productCreationRequest.getBuyPrice()
-                                )
-                                .sellPrice(
-                                        productCreationRequest.getSellPrice()
-                                )
-                                .build()
-                )
-                .description(
-                        productCreationRequest.getDescription()
-                )
-                .build();
+        Product product = getProduct(productCreationRequest);
 
-        product = createProductUseCase.execute(product);
+        Product productResponse = createProductUseCase.execute(product);
 
         return ProductCreationResponse.builder()
-                .id(product.getId())
-                .description(product.getDescription())
-                .buyPrice(product.getBuyPrice())
-                .sellPrice(product.getSellPrice())
+                .id(productResponse.getId())
+                .description(productResponse.getDescription())
+                .buyPrice(productResponse.getBuyPrice())
+                .sellPrice(productResponse.getSellPrice())
+                .build();
+    }
+
+    private Product getProduct(ProductCreationRequest productCreationRequest) {
+        return Product.builder()
+                .price(
+                        Price.builder()
+                                .buyPrice(productCreationRequest.getBuyPrice())
+                                .sellPrice(productCreationRequest.getSellPrice())
+                                .build()
+                )
+                .description(productCreationRequest.getDescription())
                 .build();
     }
 }
